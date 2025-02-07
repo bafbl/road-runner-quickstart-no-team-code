@@ -22,7 +22,7 @@ public class TestRRAuto extends LinearOpMode{
         }
         Pose2d beginPose = new Pose2d(0, 0, 0);
         Actions.runBlocking(
-                robot.rrDrive.actionBuilder(beginPose)
+                robot.rr.drive.actionBuilder(beginPose)
                         .splineTo(new Vector2d(48, 48), Math.PI / 2)
                         .waitSeconds(2)
                         .splineTo(new Vector2d(0, 96), Math.PI)
