@@ -16,7 +16,7 @@ public class Robot2024_AS {
     HardwareMap hardwareMap;
     LinearOpMode opmode;
     DriveTrainMecanum_AS teamDriveTrain;
-    MecanumDrive rrDrive;
+    RoadRunnerRobotComponent rr;
 
     TeamIMU_AS imu;
     ArmMovement_AS arm;
@@ -33,7 +33,7 @@ public class Robot2024_AS {
         this.hardwareMap = opmode.hardwareMap;
         this.opmode = opmode;
         if(isAuto){
-             rrDrive = new MecanumDrive(hardwareMap, new Pose2d(0, 0, 0));
+             rr = new RoadRunnerRobotComponent(this);
         } else {
             teamDriveTrain = new DriveTrainMecanum_AS(this);
             imu = new TeamIMU_AS(this);
@@ -86,7 +86,6 @@ public class Robot2024_AS {
         long stopT = startT + ms;
         while (!opmode.isStopRequested() && System.currentTimeMillis()<stopT)
         {
-            teamDriveTrain.stop();
             setStatus(String.format("Sleeping: %.0fsec remaining", 
                 1.0*(stopT-System.currentTimeMillis())/1000));
             loop();
