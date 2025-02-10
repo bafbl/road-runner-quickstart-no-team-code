@@ -1,8 +1,15 @@
 package org.firstinspires.ftc.teamcode.onbotjava;
 
+import androidx.annotation.NonNull;
+
 import com.acmerobotics.dashboard.config.Config;
+import com.acmerobotics.roadrunner.Arclength;
 import com.acmerobotics.roadrunner.Pose2d;
+import com.acmerobotics.roadrunner.Pose2dDual;
+import com.acmerobotics.roadrunner.PosePath;
+import com.acmerobotics.roadrunner.Twist2d;
 import com.acmerobotics.roadrunner.Vector2d;
+import com.acmerobotics.roadrunner.VelConstraint;
 import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -22,10 +29,10 @@ public class specimenRRAuto extends LinearOpMode{
            robot.loop();
         }
 
-        double H_NORTH=Math.toRadians(90);
-        double H_SOUTH=Math.toRadians(270);
-        double H_EAST=Math.toRadians(0);
-        double H_WEST=Math.toRadians(180);
+        double H_NORTH=Math.toRadians(0);
+        double H_SOUTH=Math.toRadians(180);
+        double H_EAST=Math.toRadians(270);
+        double H_WEST=Math.toRadians(90);
 
         double T_FORWARD=Math.toRadians(90);
         double T_BACK=Math.toRadians(270);
@@ -33,19 +40,44 @@ public class specimenRRAuto extends LinearOpMode{
         double T_LEFT=Math.toRadians(180);
 
         Pose2d beginPose = new Pose2d(0, 0, H_NORTH);
-        Pose2d specimenDrop = new Pose2d(25, 12, H_NORTH);
-        Pose2d afterSpecimenDrop = new Pose2d(20, -12, H_NORTH);
-
-        robot.arm.setLiftHeight(-1640,false);
+        Pose2d specimenDrop = new Pose2d(27, 12, H_NORTH);
+        Pose2d afterSpecimenDrop = new Pose2d(20, -27, H_NORTH);
+        Pose2d readyToPush1= new Pose2d(afterSpecimenDrop.position.x+36,afterSpecimenDrop.position.y,H_EAST);
+        Pose2d pushP2= new Pose2d(readyToPush1.position.x,readyToPush1.position.y-9,H_SOUTH);
+        Pose2d finishPushing=new Pose2d(4,-40,H_SOUTH);
+        Pose2d grabSpecimen= finishPushing.plus(new Twist2d(new Vector2d(4,0),0));
+        robot.arm.setLiftHeight(-1690,false);
         robot.arm.outtakeToFlat();
         Actions.runBlocking(
                 robot.rr.drive.actionBuilder(beginPose)
-                        .splineToSplineHeading(specimenDrop, 0)
-                        .waitSeconds(5)
+                        .lineToXConstantHeading(specimenDrop.position.x, new VelConstraint() {
+                            @Override
+                            public double maxRobotVel(@NonNull Pose2dDual<Arclength> pose2dDual, @NonNull PosePath posePath, double v) {
+                                return 15;
+                            }
+                        })
+                        .waitSeconds(1)
                         .stopAndAdd(() -> {robot.arm.setLiftHeight(-800);})
                         .waitSeconds(0.5)
-                        .splineToSplineHeading(afterSpecimenDrop, T_BACK)
-                        .waitSeconds(5)
+                        .lineToXConstantHeading(afterSpecimenDrop.position.x)
+                        .setTangent(H_EAST)
+                        .lineToYConstantHeading(afterSpecimenDrop.position.y)
+                        .waitSeconds(1)
+                        .splineToSplineHeading(readyToPush1,H_NORTH)
+                        .waitSeconds(1)
+                        .splineToSplineHeading(pushP2,H_EAST)
+                        .stopAndAdd(() -> {robot.arm.setLiftHeight(0,false);})
+                        .waitSeconds(1)
+                        .splineToSplineHeading(finishPushing,H_SOUTH)
+                        .splineToSplineHeading(grabSpecimen,H_SOUTH,new VelConstraint() {
+                            @Override
+                            public double maxRobotVel(@NonNull Pose2dDual<Arclength> pose2dDual, @NonNull PosePath posePath, double v) {
+                                return 5;
+                            }
+                        })
+                        .waitSeconds(2)
+                        .stopAndAdd(() -> {robot.arm.setLiftHeight(-1690,false);})
+                        .splineToSplineHeading(specimenDrop,H_WEST)
                         .build());
 
         robot.sleep(99*1000);
