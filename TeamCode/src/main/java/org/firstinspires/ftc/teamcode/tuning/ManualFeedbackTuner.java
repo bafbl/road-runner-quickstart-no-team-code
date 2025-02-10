@@ -30,9 +30,11 @@ public final class ManualFeedbackTuner extends LinearOpMode {
 
             while (opModeIsActive()) {
                 Actions.runBlocking(
-                    drive.actionBuilder(new Pose2d(0, 0, 0))
+                    drive.actionBuilder(drive.pose)
                             .lineToX(DISTANCE)
+                            .waitSeconds(0.25)
                             .lineToX(0)
+                            .waitSeconds(0.25)
                             .build());
             }
         } else if (TuningOpModes.DRIVE_CLASS.equals(TankDrive.class)) {

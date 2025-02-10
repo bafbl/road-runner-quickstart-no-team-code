@@ -20,6 +20,9 @@ public class RoadRunnerRobotComponent extends RobotComponent_AS {
 
     @Override
     public void doTelemetry(Telemetry telemetry) {
-        telemetry.addData("RR", drive.pose);
+        telemetry.addData("RR",
+                String.format("P=[%5.1f, %5.1f] %.1f deg",
+                        drive.pose.position.x, drive.pose.position.y,
+                        Math.toDegrees(drive.pose.heading.toDouble())));
     }
 }
