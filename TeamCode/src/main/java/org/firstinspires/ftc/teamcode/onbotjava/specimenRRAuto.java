@@ -7,6 +7,7 @@ import com.acmerobotics.roadrunner.Arclength;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.Pose2dDual;
 import com.acmerobotics.roadrunner.PosePath;
+import com.acmerobotics.roadrunner.PoseVelocity2d;
 import com.acmerobotics.roadrunner.Twist2d;
 import com.acmerobotics.roadrunner.Vector2d;
 import com.acmerobotics.roadrunner.VelConstraint;
@@ -40,12 +41,14 @@ public class specimenRRAuto extends LinearOpMode{
         double T_LEFT=Math.toRadians(180);
 
         Pose2d beginPose = new Pose2d(0, 0, H_NORTH);
-        Pose2d specimenDrop = new Pose2d(27, 12, H_NORTH);
-        Pose2d afterSpecimenDrop = new Pose2d(20, -27, H_NORTH);
+        Pose2d specimenDrop = new Pose2d(26, 12, H_NORTH);
+        Pose2d afterSpecimenDrop = new Pose2d(20, -30, H_NORTH);
         Pose2d readyToPush1= new Pose2d(afterSpecimenDrop.position.x+36,afterSpecimenDrop.position.y,H_EAST);
         Pose2d pushP2= new Pose2d(readyToPush1.position.x,readyToPush1.position.y-9,H_SOUTH);
-        Pose2d finishPushing=new Pose2d(4,-40,H_SOUTH);
-        Pose2d grabSpecimen= finishPushing.plus(new Twist2d(new Vector2d(4,0),0));
+        Pose2d finishPushing=new Pose2d(7,-40,H_SOUTH);
+        Pose2d grabSpecimen= finishPushing.plus(new Twist2d(new Vector2d(9,0),0));
+        Pose2d readyIntoBar= new Pose2d(14,9,H_NORTH);
+        Pose2d driveIntoBar= new Pose2d(38,9,Math.toRadians(10));
         robot.arm.setLiftHeight(-1690,false);
         robot.arm.outtakeToFlat();
         Actions.runBlocking(
@@ -76,11 +79,53 @@ public class specimenRRAuto extends LinearOpMode{
                             }
                         })
                         .waitSeconds(2)
-                        .stopAndAdd(() -> {robot.arm.setLiftHeight(-1690,false);})
-                        .splineToSplineHeading(specimenDrop,H_WEST)
+                        .stopAndAdd(() -> {robot.arm.setLiftHeight(-1000,false);})
                         .build());
+        driveForwardForTime(0.2, 3000);
+        Actions.runBlocking(
+                robot.rr.drive.actionBuilder(grabSpecimen)
+                        .lineToXConstantHeading(6)
+                        .splineToSplineHeading(readyIntoBar,H_NORTH)
+                        .stopAndAdd(() -> {robot.arm.outtakeToStart();})
+                        .build());
+
+        driveForwardForTime(0.5, 5000);
+        robot.rr.drive.updatePoseEstimate();
+        // The robot is facing north because we just ran it into the take wall,
+        // therefore, its heading is all error
+        double headingError=robot.rr.drive.pose.heading.toDouble();
+        robot.setStatus(String.format("Heading error is: %.4frad, %.2fdeg", headingError, Math.toDegrees(headingError)));
+        H_NORTH -= headingError;
+
+        Actions.runBlocking(
+                robot.rr.drive.actionBuilder(new Pose2d(0,0,H_NORTH))
+                        .lineToXConstantHeading(-5)
+                        .stopAndAdd(() -> {robot.arm.setLiftHeight(-1690, false);})
+                        .stopAndAdd(() -> {robot.arm.outtakeToFlat();})
+                        .waitSeconds(0.5)
+                        .lineToXConstantHeading(0)
+                        .waitSeconds(2)
+                        .stopAndAdd(() -> {robot.arm.setLiftHeight(-800, false);})
+                        .waitSeconds(0.5)
+
+                        .build());
+
 
         robot.sleep(99*1000);
 
+    }
+
+    public void driveForwardForTime(double power, long dur_ms) {
+        long start_ms = System.currentTimeMillis();
+        while ( !isStopRequested() && System.currentTimeMillis() < start_ms+dur_ms) {
+            robot.rr.drive.leftBack.setPower(power);
+            robot.rr.drive.rightBack.setPower(power);
+            robot.rr.drive.leftFront.setPower(power);
+            robot.rr.drive.rightFront.setPower(power);
+        }
+        robot.rr.drive.leftBack.setPower(0);
+        robot.rr.drive.rightBack.setPower(0);
+        robot.rr.drive.leftFront.setPower(0);
+        robot.rr.drive.rightFront.setPower(0);
     }
 }

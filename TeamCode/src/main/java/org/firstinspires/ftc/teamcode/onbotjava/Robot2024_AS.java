@@ -60,11 +60,15 @@ public class Robot2024_AS {
     }
     
     public void setStatus(String status){
+        if ( status.equals(this.status))
+            return;
+
+        System.err.printf("4232 Status Update: %s%n", status);
         this.status = status;
-        
     }
     
     public void alert(String message) {
+        System.err.printf("4232 Alert: %s%n", message);
         alerts.add(message);
     }
     
