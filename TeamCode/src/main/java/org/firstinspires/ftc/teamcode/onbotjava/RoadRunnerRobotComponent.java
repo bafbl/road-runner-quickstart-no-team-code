@@ -32,15 +32,29 @@ public class RoadRunnerRobotComponent extends RobotComponent_AS {
                         Math.toDegrees(pose.heading.toDouble())));
     }
 
-    public void runAction(Action action, String nameFmt, Object... nameArgs) {
+    public void runAction(Pose2d startPose, Action action, String nameFmt, Object... nameArgs) {
+        String actionName = String.format(nameFmt, nameArgs);
         FtcDashboard dash = FtcDashboard.getInstance();
         Canvas previewCanvas = new Canvas();
         action.preview(previewCanvas);
+        robot.setStatus("Running RR Action: " + actionName);
+
+        if (startPose != null ) {
+            Pose2d oldPose = drive.localizer.getPose();
+
+//            robot.log("Updating rr position: Was [%.2f, %.2f] at %.2fdeg ---> [%.2f, %.2f] at %.2fdeg",
+//                oldPose.position.x, oldPose.position.y, oldPose.heading,
+//                startPose.position.x, startPose.position.y, startPose.heading);
+//            robot.log("Updating rr position: Correction is %.2f distance and %.2fdeg",
+//                Math.sqrt((oldPose.position.x - startPose.position.x)**2 + oldPose.position.y - startPose.position.y)**2),
+//                startPose.heading.minus(oldPose.heading));
+
+            drive.localizer.setPose(startPose);
+        }
 
         boolean keepRunning = true;
         while (keepRunning && !Thread.currentThread().isInterrupted()) {
             robot.loop();
-            robot.setStatus("Running action: " + String.format(nameFmt, nameArgs));
             TelemetryPacket packet = new TelemetryPacket();
             packet.fieldOverlay().getOperations().addAll(previewCanvas.getOperations());
 
@@ -48,5 +62,6 @@ public class RoadRunnerRobotComponent extends RobotComponent_AS {
 
             dash.sendTelemetryPacket(packet);
         }
+        robot.setStatus("RR Action Done: " + actionName);
     }
 }
