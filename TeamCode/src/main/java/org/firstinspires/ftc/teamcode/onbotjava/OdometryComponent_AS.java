@@ -23,11 +23,11 @@ public class OdometryComponent_AS extends RobotComponent_AS {
         
         for (int i=0; i<10; i++) {
             try {
-                odo = hardwareMap.get(GoBildaPinpointDriver.class,"odo");
+                odo = hardwareMap.get(GoBildaPinpointDriver.class,"pinpoint");
                 break;
             } catch (IllegalArgumentException e1) {
                 e=e1;
-                odo = (GoBildaPinpointDriver) hardwareMap.get("odo");
+                odo = (GoBildaPinpointDriver) hardwareMap.get("pinpoint");
                 robot.alert("Problem with odo, retrying");
                 try {Thread.sleep(500);} catch (InterruptedException ee){return;}
             }

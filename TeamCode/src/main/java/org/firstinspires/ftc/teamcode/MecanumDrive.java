@@ -81,11 +81,11 @@ public final class MecanumDrive {
         public double maxAngAccel = Math.PI;
 
         // path controller gains
-        public double axialGain = 4;
-        public double lateralGain = 3;
-        public double headingGain = 3; // shared with turn
+        public double axialGain = 15;
+        public double lateralGain = 10;
+        public double headingGain = 5; // shared with turn
 
-        public double axialVelGain = 0;
+        public double axialVelGain = 2;
         public double lateralVelGain = 0;
         public double headingVelGain = 0.0; // shared with turn
     }
@@ -218,7 +218,7 @@ public final class MecanumDrive {
     }
 
     public MecanumDrive(HardwareMap hardwareMap, Pose2d pose) {
-        LynxFirmware.throwIfModulesAreOutdated(hardwareMap);
+        //LynxFirmware.throwIfModulesAreOutdated(hardwareMap);
 
         for (LynxModule module : hardwareMap.getAll(LynxModule.class)) {
             module.setBulkCachingMode(LynxModule.BulkCachingMode.AUTO);
