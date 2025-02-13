@@ -22,11 +22,12 @@ public class DhsLocalizerTest extends LinearOpMode {
 
         while (!isStopRequested())
         {
-            localizer.driver.update();
-            telemetry.addLine(String.format("par0=%6d par1=%6d hdg=%.3f",
-                    localizer.driver.getEncoderX(),
-                    localizer.driver.getEncoderY(),
-                    localizer.driver.getHeading()));
+            localizer.update();
+            Pose2d pose = localizer.getPose();
+            telemetry.addLine(String.format("x=%8.2f y=%8.2f hdg=%.3f",
+                    pose.position.x,
+                    pose.position.y,
+                    pose.heading));
             telemetry.update();
         }
 

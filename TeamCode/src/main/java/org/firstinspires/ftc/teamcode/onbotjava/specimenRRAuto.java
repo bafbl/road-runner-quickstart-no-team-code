@@ -90,12 +90,6 @@ public class specimenRRAuto extends LinearOpMode{
                         .build());
 
         driveForwardForTime(0.5, 5000);
-        robot.rr.drive.updatePoseEstimate();
-        // The robot is facing north because we just ran it into the take wall,
-        // therefore, its heading is all error
-        double headingError=robot.rr.drive.pose.heading.toDouble();
-        robot.setStatus(String.format("Heading error is: %.4frad, %.2fdeg", headingError, Math.toDegrees(headingError)));
-        H_NORTH -= headingError;
 
         Actions.runBlocking(
                 robot.rr.drive.actionBuilder(new Pose2d(0,0,H_NORTH))

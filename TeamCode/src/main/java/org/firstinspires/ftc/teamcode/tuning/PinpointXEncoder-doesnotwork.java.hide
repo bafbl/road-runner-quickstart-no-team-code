@@ -1,0 +1,50 @@
+package org.firstinspires.ftc.teamcode.tuning;
+
+import androidx.annotation.NonNull;
+
+import com.acmerobotics.roadrunner.ftc.Encoder;
+import com.acmerobotics.roadrunner.ftc.PositionVelocityPair;
+import com.qualcomm.robotcore.hardware.DcMotorController;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
+
+import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
+import org.firstinspires.ftc.teamcode.PinpointLocalizer;
+
+public class PinpointXEncoder extends Encoder {
+    PinpointLocalizer localizer;
+    Integer previousPosition=null;
+    public PinpointXEncoder(PinpointLocalizer localizer) {
+        this.localizer = localizer;
+    }
+
+    @NonNull
+    @Override
+    public DcMotorController getController() {
+        return null;
+    }
+
+    @NonNull
+    @Override
+    public PositionVelocityPair getPositionAndVelocity() {
+        localizer.driver.update();
+        int position = localizer.driver.getEncoderX();
+        int velocity;
+        if ( previousPosition == null )
+            velocity=0;
+        else
+            velocity = position-previousPosition;
+        PositionVelocityPair result = new PositionVelocityPair(position, velocity, position, velocity);
+        previousPosition = position;
+        return result;
+    }
+
+    @NonNull
+    @Override
+    public DcMotorSimple.Direction getDirection() {
+        return null;
+    }
+
+    @Override
+    public void setDirection(@NonNull DcMotorSimple.Direction direction) {
+    }
+}

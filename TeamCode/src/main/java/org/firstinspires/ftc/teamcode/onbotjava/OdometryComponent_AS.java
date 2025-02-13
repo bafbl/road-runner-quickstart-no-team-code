@@ -4,13 +4,14 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
+import org.firstinspires.ftc.teamcode.GoBildaPinpointDriver;
 
 import java.util.Locale;
 
 
 public class OdometryComponent_AS extends RobotComponent_AS {
     //write code here
-    GoBildaPinpointDriver_AS odo;
+    GoBildaPinpointDriver odo;
     Pose2D currentPosition;
     Pose2D currentVelocity;
     
@@ -22,21 +23,21 @@ public class OdometryComponent_AS extends RobotComponent_AS {
         
         for (int i=0; i<10; i++) {
             try {
-                odo = hardwareMap.get(GoBildaPinpointDriver_AS.class,"odo");
+                odo = hardwareMap.get(GoBildaPinpointDriver.class,"odo");
                 break;
             } catch (IllegalArgumentException e1) {
                 e=e1;
-                odo = (GoBildaPinpointDriver_AS) hardwareMap.get("odo");
+                odo = (GoBildaPinpointDriver) hardwareMap.get("odo");
                 robot.alert("Problem with odo, retrying");
                 try {Thread.sleep(500);} catch (InterruptedException ee){return;}
             }
         }
         if ( odo==null )
             throw e;
-        odo = hardwareMap.get(GoBildaPinpointDriver_AS.class,"odo");
+        odo = hardwareMap.get(GoBildaPinpointDriver.class,"odo");
         odo.setOffsets(92.075, -50.8); //these are tuned for 3110-0002-0001 Product Insight #1
-        odo.setEncoderResolution(GoBildaPinpointDriver_AS.GoBildaOdometryPods.goBILDA_4_BAR_POD);
-        odo.setEncoderDirections(GoBildaPinpointDriver_AS.EncoderDirection.FORWARD, GoBildaPinpointDriver_AS.EncoderDirection.FORWARD);
+        odo.setEncoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD);
+        odo.setEncoderDirections(GoBildaPinpointDriver.EncoderDirection.FORWARD, GoBildaPinpointDriver.EncoderDirection.FORWARD);
         odo.resetPosAndIMU();
 
         odo.getVelocity();
