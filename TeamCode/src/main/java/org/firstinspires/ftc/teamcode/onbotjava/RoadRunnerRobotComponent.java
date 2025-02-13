@@ -32,8 +32,7 @@ public class RoadRunnerRobotComponent extends RobotComponent_AS {
                         Math.toDegrees(pose.heading.toDouble())));
     }
 
-    public void runAction(Pose2d startPose, Action action, String nameFmt, Object... nameArgs) {
-        String actionName = String.format(nameFmt, nameArgs);
+    public void runAction(Pose2d startPose, String actionName, Action action) {
         FtcDashboard dash = FtcDashboard.getInstance();
         Canvas previewCanvas = new Canvas();
         action.preview(previewCanvas);

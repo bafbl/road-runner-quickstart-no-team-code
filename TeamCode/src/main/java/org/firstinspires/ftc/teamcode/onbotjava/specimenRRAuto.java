@@ -51,6 +51,7 @@ public class specimenRRAuto extends LinearOpMode{
         Pose2d driveIntoBar= new Pose2d(38,9,Math.toRadians(10));
         robot.arm.setLiftHeight(-1690,false);
         robot.arm.outtakeToFlat();
+        robot.rr.runAction(beginPose, );
         Actions.runBlocking(
                 robot.rr.drive.actionBuilder(beginPose)
                         .lineToXConstantHeading(specimenDrop.position.x, new VelConstraint() {
