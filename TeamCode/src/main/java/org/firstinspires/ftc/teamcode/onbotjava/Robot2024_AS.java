@@ -22,7 +22,7 @@ public class Robot2024_AS {
     ArmMovement_AS arm;
     String status = "";
     AprilTagComponent_AS_AS aprilTagComponent;
-    //OdometryComponent_AS odo;
+    OdometryComponent_AS odo;
     ArrayList<String> alerts = new ArrayList<>();
     
     List<RobotComponent_AS> robotComponents = new ArrayList<>();
@@ -32,15 +32,15 @@ public class Robot2024_AS {
     public Robot2024_AS(LinearOpMode opmode, boolean isAuto){
         this.hardwareMap = opmode.hardwareMap;
         this.opmode = opmode;
+        imu = new TeamIMU_AS(this);
+        odo = new OdometryComponent_AS(this);
         if(isAuto){
              rr = new RoadRunnerRobotComponent(this);
         } else {
             teamDriveTrain = new DriveTrainMecanum_AS(this);
-            imu = new TeamIMU_AS(this);
         }
         arm = new ArmMovement_AS(this);
         aprilTagComponent = new AprilTagComponent_AS_AS(this);
-        //odo = new OdometryComponent_AS(this);
     }
     
     public void loop(){
