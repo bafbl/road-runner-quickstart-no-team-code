@@ -83,7 +83,10 @@ public class SensorGoBildaPinpointExample_AS extends LinearOpMode {
         the tracking point the Y (strafe) odometry pod is. forward of center is a positive number,
         backwards is a negative number.
          */
-        odo.setOffsets(-85.0, -170.0); //these are tuned for 3110-0002-0001 Product Insight #1
+
+        // DHS Team 4232 2024-2025 Robot Geometry
+        // TRACKING POINT: Center of outtake side
+        odo.setOffsets(92.075, -50.8); //these are tuned for 3110-0002-0001 Product Insight #1
 
         /*
         Set the kind of pods used by your robot. If you're using goBILDA odometry pods, select either

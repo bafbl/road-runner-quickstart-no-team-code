@@ -33,36 +33,12 @@ public class OdometryComponent_AS extends RobotComponent_AS {
         }
         if ( odo==null )
             throw e;
-
-        /*
-        Set the odometry pod positions relative to the point that the odometry computer tracks around.
-        The X pod offset refers to how far sideways from the tracking point the
-        X (forward) odometry pod is. Left of the center is a positive number,
-        right of center is a negative number. the Y pod offset refers to how far forwards from
-        the tracking point the Y (strafe) odometry pod is. forward of center is a positive number,
-        backwards is a negative number.
-         */
-        odo.setOffsets(-85.0, -170.0); //these are tuned for 3110-0002-0001 Product Insight #1
-
-        /*
-        Set the kind of pods used by your robot. If you're using goBILDA odometry pods, select either
-        the goBILDA_SWINGARM_POD, or the goBILDA_4_BAR_POD.
-        If you're using another kind of odometry pod, uncomment setEncoderResolution and input the
-        number of ticks per mm of your odometry pod.
-         */
+        odo = hardwareMap.get(GoBildaPinpointDriver_AS.class,"odo");
+        odo.setOffsets(92.075, -50.8); //these are tuned for 3110-0002-0001 Product Insight #1
         odo.setEncoderResolution(GoBildaPinpointDriver_AS.GoBildaOdometryPods.goBILDA_4_BAR_POD);
-        //odo.setEncoderResolution(13.26291192);
-
-
-        /*
-        Set the direction that each of the two odometry pods count. The X (forward) pod should
-        increase when you move the robot forward. And the Y (strafe) pod should increase when
-        you move the robot to the left.
-         */
-        odo.setEncoderDirections(GoBildaPinpointDriver_AS.EncoderDirection.REVERSED, GoBildaPinpointDriver_AS.EncoderDirection.FORWARD);
+        odo.setEncoderDirections(GoBildaPinpointDriver_AS.EncoderDirection.FORWARD, GoBildaPinpointDriver_AS.EncoderDirection.FORWARD);
         odo.resetPosAndIMU();
-        odo.recalibrateIMU();
-        odo.setPosition(new Pose2D(DistanceUnit.INCH, 0, 0, AngleUnit.DEGREES,0));
+
         odo.getVelocity();
         loop();
     }
@@ -80,6 +56,8 @@ public class OdometryComponent_AS extends RobotComponent_AS {
     }
     
     public void setPosition(Pose2D newPosition) {
+        currentPosition = newPosition;
+        currentVelocity = new Pose2D(DistanceUnit.INCH, 0, 0, AngleUnit.DEGREES, 0);
         odo.setPosition(newPosition);
     }
 }    
