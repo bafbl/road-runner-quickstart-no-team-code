@@ -1,5 +1,9 @@
 package org.firstinspires.ftc.teamcode.onbotjava;
 
+import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.canvas.Canvas;
+import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
+import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.Pose2d;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
@@ -26,5 +30,23 @@ public class RoadRunnerRobotComponent extends RobotComponent_AS {
                         pose.position.x,
                         pose.position.y,
                         Math.toDegrees(pose.heading.toDouble())));
+    }
+
+    public void runAction(Action action, String nameFmt, Object... nameArgs) {
+        FtcDashboard dash = FtcDashboard.getInstance();
+        Canvas previewCanvas = new Canvas();
+        action.preview(previewCanvas);
+
+        boolean keepRunning = true;
+        while (keepRunning && !Thread.currentThread().isInterrupted()) {
+            robot.loop();
+            robot.setStatus("Running action: " + String.format(nameFmt, nameArgs));
+            TelemetryPacket packet = new TelemetryPacket();
+            packet.fieldOverlay().getOperations().addAll(previewCanvas.getOperations());
+
+            keepRunning = action.run(packet);
+
+            dash.sendTelemetryPacket(packet);
+        }
     }
 }
