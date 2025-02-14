@@ -49,16 +49,18 @@ public class specimenRRAuto extends LinearOpMode{
         Pose2d grabSpecimen= finishPushing.plus(new Twist2d(new Vector2d(9,0),0));
         Pose2d readyIntoBar= new Pose2d(14,9,H_NORTH);
         Pose2d driveIntoBar= new Pose2d(38,9,H_NORTH);
+        Pose2d almostnewSpecimenDrop= new Pose2d(26,9,H_NORTH);
         Pose2d newSpecimenDrop= new Pose2d(29,9,H_NORTH);
         robot.arm.setLiftHeight(-1690,false);
         robot.arm.outtakeToFlat();
         //robot.rr.runAction(beginPose, );
         robot.rr.runAction(beginPose, "starting_drop",
                 robot.rr.drive.actionBuilder(beginPose)
+                        //set a
                         .lineToXConstantHeading(specimenDrop.position.x, new VelConstraint() {
                             @Override
                             public double maxRobotVel(@NonNull Pose2dDual<Arclength> pose2dDual, @NonNull PosePath posePath, double v) {
-                                return 15;
+                                return 25;
                             }
                         })
                         .waitSeconds(1)
@@ -68,26 +70,33 @@ public class specimenRRAuto extends LinearOpMode{
                         .setTangent(H_EAST)
                         .lineToYConstantHeading(afterSpecimenDrop.position.y)
                         //.waitSeconds(1)
+                        //set b
                         .splineToSplineHeading(readyToPush1,H_NORTH)
                         //.waitSeconds(1)
+                        //set c
                         .splineToSplineHeading(pushP2,H_EAST)
                         .stopAndAdd(() -> {robot.arm.setLiftHeight(0,false);})
                         //.waitSeconds(1)
+                        //set d
                         .splineToSplineHeading(finishPushing,H_SOUTH)
                         .waitSeconds(.5)
+                        //set e
                         .splineToSplineHeading(grabSpecimen,H_SOUTH,new VelConstraint() {
                             @Override
                             public double maxRobotVel(@NonNull Pose2dDual<Arclength> pose2dDual, @NonNull PosePath posePath, double v) {
                                 return 5;
                             }
                         })
-                        .waitSeconds(2)
-                        .stopAndAdd(() -> {robot.arm.setLiftHeight(-1000,false);})
+                        .waitSeconds(0.5)
+                        .stopAndAdd(() -> {robot.arm.setLiftHeight(-1740,false);})
                         .build());
         robot.rr.runAction(null,"ready_up",
                 robot.rr.drive.actionBuilder(beginPose)
-                        .lineToXConstantHeading(2)
+                        //set f
+                        .lineToXConstantHeading(4)
+                        //set g
                         .splineToSplineHeading(readyIntoBar,H_NORTH)
+                        .waitSeconds(0.5)
                         //.stopAndAdd(() -> {robot.arm.outtakeToStart();})
                         .build());
 
@@ -97,19 +106,33 @@ public class specimenRRAuto extends LinearOpMode{
         robot.rr.runAction(null,"second_drop",
                 robot.rr.drive.actionBuilder(beginPose)
                         //.lineToXConstantHeading(-5)
-                        .stopAndAdd(() -> {robot.arm.setLiftHeight(-1690, false);})
+                        //.stopAndAdd(() -> {robot.arm.setLiftHeight(-1690, false);})
                         .stopAndAdd(() -> {robot.arm.outtakeToFlat();})
                         .waitSeconds(0.5)
-                        .splineToSplineHeading(newSpecimenDrop,H_NORTH)
-                        .waitSeconds(2)
+                        //set h
+                        .splineToSplineHeading(almostnewSpecimenDrop,H_NORTH)
+                        .waitSeconds(0.5)
+                        //.splineToSplineHeading(newSpecimenDrop,H_NORTH)
                         .stopAndAdd(() -> {robot.arm.setLiftHeight(-800, false);})
                         .waitSeconds(0.5)
-
                         .build());
-
-
-        robot.sleep(99*1000);
-
+        robot.rr.runAction(null,"third_drop",
+                robot.rr.drive.actionBuilder(almostnewSpecimenDrop)
+                        .setTangent(H_SOUTH)
+                        //step j (same place as d)
+                        .splineToSplineHeading(finishPushing,H_SOUTH)
+                        .stopAndAdd(() -> {robot.arm.setLiftHeight(0,false);})
+                        .waitSeconds(0.5)
+                        //step k (same place as e)
+                        .splineToSplineHeading(grabSpecimen,H_SOUTH,new VelConstraint() {
+                            @Override
+                            public double maxRobotVel(@NonNull Pose2dDual<Arclength> pose2dDual, @NonNull PosePath posePath, double v) {
+                                return 5;
+                            }
+                        })
+                        .waitSeconds(0.5)
+                        .stopAndAdd(() -> {robot.arm.setLiftHeight(-1740,false);})
+                        .build());
     }
 
     public void driveForwardForTime(double power, long dur_ms) {
