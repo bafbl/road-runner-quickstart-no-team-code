@@ -12,7 +12,7 @@ public class DhsLocalizerTest extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
         // This opmode only cares about ticks, so we're going to just call it 1 in/tick
-       PinpointLocalizer localizer=new PinpointLocalizer(hardwareMap, new Pose2d(0,0,0));
+       PinpointLocalizer localizer= PinpointLocalizer.getSharedInstance(hardwareMap, new Pose2d(0,0,0));
 
         while (!isStarted())
         {

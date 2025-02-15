@@ -53,12 +53,13 @@ public class specimenRRAuto extends LinearOpMode{
         Pose2d almostnewSpecimenDrop2= new Pose2d(25,9,H_NORTH);
         Pose2d newSpecimenDrop= new Pose2d(29,9,H_NORTH);
         //robot.rr.runAction(beginPose, );
-        robot.rr.runAction(beginPose, "starting_drop",
+        robot.rr.runAction(beginPose, "specimen auto",
                 robot.rr.drive.actionBuilder(beginPose)
                         .stopAndAdd(() -> {robot.arm.setLiftHeight(-1690,false);})
                         .stopAndAdd(() -> {robot.arm.outtakeToFlat();})
 
                         //set A A A A A - Approach submersible
+                        .stopAndAdd(() -> {robot.setStatus("Auto step A (approach submersible)");})
                         .lineToXConstantHeading(specimenDrop.position.x, new VelConstraint() {
                             @Override
                             public double maxRobotVel(@NonNull Pose2dDual<Arclength> pose2dDual, @NonNull PosePath posePath, double v) {
@@ -72,96 +73,108 @@ public class specimenRRAuto extends LinearOpMode{
 
                         // Step B B B B B B -- Back away from submersible and move to the right
                         // Achieve afterSpecimenDrop location in X and then Y, to avoid submersible
+                        .stopAndAdd(() -> {robot.setStatus("Auto step B (back away from submersible)");})
                         .lineToXConstantHeading(afterSpecimenDrop.position.x)
-                        .waitSeconds(10)
                         .setTangent(H_EAST)
                         .lineToYConstantHeading(afterSpecimenDrop.position.y)
 
                         //Step C C C C C C C - Move into pushing position
+                        .stopAndAdd(() -> {robot.setStatus("Auto step C (move into pushing position)");})
                         .splineToSplineHeading(readyToPush1,H_NORTH)
                         .splineToSplineHeading(pushP2,H_EAST)
 
-                        //.waitSeconds(1)
                         //set D D D D D D D - Lower arm (if not already)  and drive just short of the wall
-                        .stopAndAdd(() -> {robot.arm.setLiftHeight(0,false);})
+                        // already done above: .stopAndAdd(() -> {robot.arm.setLiftHeight(0,false);})
+                        .stopAndAdd(() -> {robot.setStatus("Auto step D (lower arm and push)");})
                         .stopAndAdd(() -> {robot.arm.outtakeToFlat();})
                         .splineToSplineHeading(finishPushing,H_SOUTH)
                         .waitSeconds(.25)
+
+
                         //set E E E E E E - Drive forward slowly to pickup specimen
+                        .stopAndAdd(() -> {robot.setStatus("Auto step E (pick up specimen)");})
                         .splineToSplineHeading(grabSpecimen,H_SOUTH,new VelConstraint() {
                             @Override
                             public double maxRobotVel(@NonNull Pose2dDual<Arclength> pose2dDual, @NonNull PosePath posePath, double v) {
                                 return 10;
                             }
                         })
-                        // Lift specimen off rail
-                        .stopAndAdd(() -> {robot.arm.setLiftHeight(-200,false);})
-                        .waitSeconds(0.1)
 
-                        //set F F F F F F - Back off the rail
+                        //set F F F F F F - Lift specimen off rail and Back off the rail
+                        .stopAndAdd(() -> {robot.setStatus("Auto step F (lift specimen and back away from wall)");})
+                        .stopAndAdd(() -> {robot.arm.outtakeToStart();})
+                        .waitSeconds(0.1)
                         .setTangent(H_NORTH)
                         .lineToXConstantHeading(4)
+
                         //set G G G G G G G - Race over to the submersible bar
+                        .stopAndAdd(() -> {robot.setStatus("Auto step G (go to submersible)");})
                         .splineToSplineHeading(readyIntoBar,H_WEST)
                         .waitSeconds(0.25)
-                        //.stopAndAdd(() -> {robot.arm.outtakeToStart();})
-                        //.lineToXConstantHeading(-5)
-                        //.stopAndAdd(() -> {robot.arm.setLiftHeight(-1690, false);})
-                        .stopAndAdd(() -> {robot.arm.setLiftHeight(-1740,false);})
                         .stopAndAdd(() -> {robot.arm.outtakeToFlat();})
-                        .waitSeconds(0.25)
-                        //set h
-                        .splineToSplineHeading(almostnewSpecimenDrop,H_NORTH)
-                        .waitSeconds(0.25)
-                        //.splineToSplineHeading(newSpecimenDrop,H_NORTH)
+                        .stopAndAdd(() -> {robot.arm.setLiftHeight(-1740,true);})
 
-                        // Lower and then fold up and park robot arm
+                        //set H H H H H H - Specimen-Drop position
+                        .stopAndAdd(() -> {robot.setStatus("Auto step H (get ready to clip specimen)");})
+                        .splineToSplineHeading(almostnewSpecimenDrop,H_NORTH)
+                        .waitSeconds(0.1)
+
+                        // set I I I I I  -  Lower and then fold up and park robot arm
+                        .stopAndAdd(() -> {robot.setStatus("Auto step I (clip specimen)");})
                         .stopAndAdd(() -> {robot.arm.setLiftHeight(-800);})
                         .stopAndAdd(() -> {robot.arm.outtakeToStart();})
                         .stopAndAdd(() -> {robot.arm.setLiftHeight(0, false);})
                         .waitSeconds(0.25)
-                        .setTangent(H_SOUTH)
+
                         //step J J J J J J  (same place as d) - Race towards specimen pickup
+                        .stopAndAdd(() -> {robot.setStatus("Auto step J (go to specimen pickup)");})
+                        .setTangent(H_SOUTH)
                         .splineToSplineHeading(finishPushing,H_SOUTH)
-                        .stopAndAdd(() -> {robot.arm.outtakeToFlat();})
-                        .waitSeconds(0.25)
 
                         //step K K K K K K K (same place as e)  - Drive forward to pick up specimen from rail
+                        .stopAndAdd(() -> {robot.setStatus("Auto step K (grab specimen)");})
+                        .stopAndAdd(() -> {robot.arm.outtakeToFlat();})
+                        .waitSeconds(0.1)
                         .splineToSplineHeading(grabSpecimen,H_SOUTH,new VelConstraint() {
                             @Override
                             public double maxRobotVel(@NonNull Pose2dDual<Arclength> pose2dDual, @NonNull PosePath posePath, double v) {
                                 return 5;
                             }
                         })
-                        // Lift specimen off rail
-                        .stopAndAdd(() -> {robot.arm.setLiftHeight(-200,false);})
-                        .waitSeconds(0.25)
-                        //set L L L L L L (same place as f), back away from wall
+
+                        //set L L L L L L (same place as f), Lift specimen off rail and back away from wall
+                        .stopAndAdd(() -> {robot.setStatus("Auto step L (lift specimen and back away from wall)");})
+                        .stopAndAdd(() -> {robot.arm.outtakeToStart();})
+                        .waitSeconds(0.1)
+                        .setTangent(H_NORTH)
                         .lineToXConstantHeading(4)
 
-                        //set M M M M M M (same place as g) - Raise arm and drive to bar
+                        //set M M M M M M (similar to g) - Raise arm and drive to submersible bar
+                        .stopAndAdd(() -> {robot.setStatus("Auto step M (go to submersible)");})
                         .stopAndAdd(() -> {robot.arm.outtakeToFlat();})
                         .stopAndAdd(() -> {robot.arm.setLiftHeight(-1740, false);})
                         .waitSeconds(0.25)
                         .splineToSplineHeading(readyIntoBar,H_WEST)
-                        //.stopAndAdd(() -> {robot.arm.outtakeToStart();})
                         .waitSeconds(0.25)
 
-                        // Lower arm, fold up box, and then park arm
+                        // set N N N N N N - CLIP Lower arm, fold up box, and then park arm
+                        .stopAndAdd(() -> {robot.setStatus("Auto step N (CLIP specimen)");})
                         .stopAndAdd(() -> {robot.arm.setLiftHeight(-800);})
                         .stopAndAdd(() -> {robot.arm.outtakeToStart();})
                         .stopAndAdd(() -> {robot.arm.setLiftHeight(0, false);})
+                        .waitSeconds(0.1)
 
-                        // Back away from the submersible
+                        // set O O O O O O - ???
+                        .stopAndAdd(() -> {robot.setStatus("Auto step O (????)");})
                         .lineToXConstantHeading(-5)
                         .setTangent(H_WEST)
                         .lineToYConstantHeading(almostnewSpecimenDrop2.position.y)
-                        .setTangent(H_WEST)
 
-                        //set n (same place as h)
+                        //set P P P P P P - ???
+                        .stopAndAdd(() -> {robot.setStatus("Auto step P (???)");})
                         .splineToSplineHeading(almostnewSpecimenDrop2,H_NORTH)
                         .waitSeconds(0.25)
-                        .build());        //driveForwardForTime(0.5, 5000);
+                        .build());
 
     }
 

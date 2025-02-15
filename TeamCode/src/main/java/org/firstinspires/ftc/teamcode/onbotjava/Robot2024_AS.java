@@ -1,8 +1,11 @@
 package org.firstinspires.ftc.teamcode.onbotjava;
 
+import android.annotation.SuppressLint;
+
 import com.acmerobotics.roadrunner.Pose2d;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.VoltageSensor;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
@@ -14,10 +17,12 @@ import java.util.List;
 
 public class Robot2024_AS {
     HardwareMap hardwareMap;
+    VoltageSensor voltageSensor;
     LinearOpMode opmode;
     DriveTrainMecanum_AS teamDriveTrain;
     RoadRunnerRobotComponent rr;
 
+    public final boolean isAuto;
     TeamIMU_AS imu;
     ArmMovement_AS arm;
     String status = "";
@@ -30,8 +35,10 @@ public class Robot2024_AS {
     
     
     public Robot2024_AS(LinearOpMode opmode, boolean isAuto){
+        this.isAuto = isAuto;
         this.hardwareMap = opmode.hardwareMap;
         this.opmode = opmode;
+        voltageSensor = hardwareMap.voltageSensor.iterator().next();
         imu = new TeamIMU_AS(this);
         odo = new OdometryComponent_AS(this);
         if(isAuto){
@@ -43,13 +50,17 @@ public class Robot2024_AS {
         aprilTagComponent = new AprilTagComponent_AS_AS(this);
     }
     
+    @SuppressLint("DefaultLocale")
     public void loop(){
         alerts.clear();
         for (RobotComponent_AS component: robotComponents) {
             component.loop();
         }
 
-        opmode.telemetry.addData("Robot", String.format("#components: %d", robotComponents.size()));
+        double voltage = voltageSensor.getVoltage();
+        opmode.telemetry.addData("Robot", String.format("#components: %d Voltage: %.1f", robotComponents.size(), voltage));
+        if (voltage<11)
+            alert(String.format("Voltage is lowish: %.1f", voltage));
 
         opmode.telemetry.addData("Status", status);
         opmode.telemetry.addData("ALERTS", alerts.toString());
