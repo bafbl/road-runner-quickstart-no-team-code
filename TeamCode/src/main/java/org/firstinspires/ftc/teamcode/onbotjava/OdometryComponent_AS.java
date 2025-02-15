@@ -37,7 +37,7 @@ public class OdometryComponent_AS extends RobotComponent_AS {
         }
         if ( localizer==null )
             throw e;
-        localizer = PinpointLocalizer.getSharedInstance(hardwareMap,null);
+        localizer = PinpointLocalizer.getSharedInstance(hardwareMap,new Pose2d(0,0, 0));
 
         loop();
     }
@@ -57,7 +57,7 @@ public class OdometryComponent_AS extends RobotComponent_AS {
     public void doTelemetry(Telemetry telemetry){
         String data = String.format(Locale.US, "{X: %.1f in, Y: %.1f in, H: %.1f}", 
             currentPosition.position.x, currentPosition.position.y,
-            currentPosition.heading);
+            currentPosition.heading.toDouble());
         telemetry.addData("Odo position", data);
     }
     

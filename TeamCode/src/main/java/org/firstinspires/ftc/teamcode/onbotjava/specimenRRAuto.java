@@ -145,34 +145,7 @@ public class specimenRRAuto extends LinearOpMode{
                         //set L L L L L L (same place as f), Lift specimen off rail and back away from wall
                         .stopAndAdd(() -> {robot.setStatus("Auto step L (lift specimen and back away from wall)");})
                         .stopAndAdd(() -> {robot.arm.outtakeToStart();})
-                        .waitSeconds(0.1)
-                        .setTangent(H_NORTH)
-                        .lineToXConstantHeading(4)
-
-                        //set M M M M M M (similar to g) - Raise arm and drive to submersible bar
-                        .stopAndAdd(() -> {robot.setStatus("Auto step M (go to submersible)");})
-                        .stopAndAdd(() -> {robot.arm.outtakeToFlat();})
-                        .stopAndAdd(() -> {robot.arm.setLiftHeight(-1740, false);})
-                        .waitSeconds(0.25)
-                        .splineToSplineHeading(readyIntoBar,H_WEST)
-                        .waitSeconds(0.25)
-
-                        // set N N N N N N - CLIP Lower arm, fold up box, and then park arm
-                        .stopAndAdd(() -> {robot.setStatus("Auto step N (CLIP specimen)");})
-                        .stopAndAdd(() -> {robot.arm.setLiftHeight(-800);})
-                        .stopAndAdd(() -> {robot.arm.outtakeToStart();})
-                        .stopAndAdd(() -> {robot.arm.setLiftHeight(0, false);})
-                        .waitSeconds(0.1)
-
-                        // set O O O O O O - ???
-                        .stopAndAdd(() -> {robot.setStatus("Auto step O (????)");})
-                        .lineToXConstantHeading(-5)
-                        .setTangent(H_WEST)
-                        .lineToYConstantHeading(almostnewSpecimenDrop2.position.y)
-
-                        //set P P P P P P - ???
-                        .stopAndAdd(() -> {robot.setStatus("Auto step P (???)");})
-                        .splineToSplineHeading(almostnewSpecimenDrop2,H_NORTH)
+                        .waitSeconds(0.5)
                         .waitSeconds(0.25)
                         .build());
 

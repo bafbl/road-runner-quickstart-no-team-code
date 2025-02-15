@@ -30,6 +30,9 @@ public final class PinpointLocalizer implements Localizer {
     PoseVelocity2d previousUpdateResult;
 
     public static PinpointLocalizer getSharedInstance(HardwareMap hardwareMap, Pose2d initialPose) {
+        if (initialPose == null)
+            initialPose = new Pose2d(0,0,0);
+
         if (sharedInstance == null )
             sharedInstance = new PinpointLocalizer(hardwareMap, initialPose);
         return sharedInstance;
@@ -60,7 +63,7 @@ public final class PinpointLocalizer implements Localizer {
 
     @Override
     public Pose2d getPose() {
-        return txWorldPinpoint.times(txPinpointRobot);
+         return txWorldPinpoint.times(txPinpointRobot);
     }
 
     @Override
